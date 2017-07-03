@@ -1,59 +1,29 @@
 // scripts.js
 
-var url = 'http://api.icndb.com/jokes/random';
+var url = 'https://restcountries.eu/rest/v1/name/';
+var countriesList = $('#countries');
 
-var $button = $('#get-joke').click(function() {
-	getJoke();
-});
+$('#search').click(searchCountries);
 
-var $paragraph = $('#joke');
-
-function getJoke() {
-$.ajax({
-	method: 'GET',
-	url: url, //here's a weird construction, but on the left we have the name of the parameter, and to the right is the name of the variable that holds the value
-	success: function(res) {
-		$paragraph.text(res.value.joke);
+function searchCountries(event) {
+	event.preventDefault();
+	
+	var countryName = $('#country-name').val();
+	
+	if(!countryName.length) {
+		countryName = 'Poland';
 	}
-
-});
-}
-var prefix = "https://cors-anywhere.herokuapp.com/";
-var tweetLink = "https://twitter.com/intent/tweet?text=";
-var quoteUrl = "https://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1";
-
-function getQuote() {
-    $.getJSON(quoteUrl, createTweet);
-	$.getJSON(prefix + quoteUrl, createTweet);
-	$.ajaxSetup({ cache: false });
+	$.ajax({
+		url: url + countryName,
+		method: 'GET',
+		success: showCountriesList
+	});
 }
 
-function createTweet(input) {
-    var data = input[0];
-
-    var quoteText = $(data.content).text().trim();
-    var quoteAuthor = data.title;
-
-    if (!quoteAuthor.length) {
-        quoteAuthor = "Unknown author";
-    }
-
-	var tweetText = "Quote of the day - " + quoteText + " Author: " + quoteAuthor;
-	if (tweetText.length > 140) {
-    getQuote();
-} else {
-    var tweet = tweetLink + encodeURIComponent(tweetText);
-    $('.quote').text(quoteText);
-    $('.author').text("Author: " + quoteAuthor);
-    $('.tweet').attr('href', tweet);
+function showCountriesList(resp) {
+	countriesList.empty();
+	res.forEach(function(item){
+		var country = item.name + ' (' + item.capital + ')';
+		$('<li>').text(country).appendTo(countriesList);
+	});
 }
-$('.tweet').attr('href', tweet);
-}
-
-$(document).ready(function() {
-    getQuote();
-    $('.trigger').click(function() {
-        getQuote();
-    })
-});
-
